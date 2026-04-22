@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Room - AI LearnPro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+/* BASE */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  transition: 0.4s;
+}
+
+/* LIGHT MODE */
+body.light {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #111;
+}
+
+/* HEADER */
+header {
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* MAIN */
+main {
+  padding: 20px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* GLASS CARDS */
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+body.light .card {
+  background: rgba(255,255,255,0.7);
+  color: black;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* BUTTON */
+button {
+  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* INPUT */
+input {
+  padding: 8px;
+  width: 65%;
+  border-radius: 6px;
+  border: none;
+}
+
+/* TASK LIST */
+li {
+  margin: 5px 0;
+  background: rgba(255,255,255,0.1);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* TIMER */
+.timer {
+  font-size: 28px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* AUDIO */
+audio {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* SELECT */
+select {
+  padding: 6px;
+  border-radius: 6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div><b>🤖 AI LearnPro</b></div>
+  <a href="dashboard.html">Back</a>
+</header>
+
+<main>
+
+<section class="hero">
+  <h2>My Study Room ✨</h2>
+  <p>Focus • Learn • Grow</p>
+</section>
+
+<div class="grid">
+
+<!-- TASK -->
+<div class="card">
+  <h3>Tasks</h3>
+  <input id="taskInput" placeholder="Add task...">
+  <button onclick="addTask()">Add</button>
+  <ul id="taskList"></ul>
+</div>
+
+<!-- TIMER -->
+<div class="card">
+  <h3>Focus Timer</h3>
+
+  <select id="timerMode">
+    <option value="1500">25 min</option>
+    <option value="600">10 min</option>
+    <option value="3000">50 min</option>
+  </select>
+
+  <br><br>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="pauseTimer()">Pause</button>
+
+  <div class="timer" id="timer">25:00</div>
+</div>
+
+<!-- AI -->
+<div class="card">
+  <h3>AI Assistant</h3>
+  <p>Need help? Ask anytime</p>
+  <button onclick="openAI()">Ask AI</button>
+</div>
+
+<!-- MUSIC -->
+<div class="card">
+  <h3>Focus Music</h3>
+
+  <select onchange="changeMusic(this.value)">
+    <option value="lofi">Lofi</option>
+    <option value="nature">Nature</option>
+    <option value="rain">Rain</option>
+  </select>
+
+  <audio id="player" controls>
+    <source id="musicSource" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+  </audio>
+</div>
+
+<!-- THEME -->
+<div class="card">
+  <h3>Theme</h3>
+
+  <select onchange="changeTheme(this.value)">
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+    <option value="#1e1b4b">Purple</option>
+    <option value="#064e3b">Green</option>
+  </select>
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+/* TASK */
+function addTask() {
+  let input = document.getElementById("taskInput");
+  if(input.value === "") return;
+
+  let li = document.createElement("li");
+  li.innerHTML = input.value + " <button onclick='this.parentElement.remove()'>X</button>";
+
+  document.getElementById("taskList").appendChild(li);
+  input.value = "";
+}
+
+/* TIMER */
+let time = 1500;
+let interval;
+let running = false;
+
+function startTimer() {
+  if(running) return;
+
+  time = parseInt(document.getElementById("timerMode").value);
+  running = true;
+
+  interval = setInterval(() => {
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+
+    document.getElementById("timer").innerText =
+      `${m}:${s < 10 ? '0' : ''}${s}`;
+
+    if(time <= 0){
+      clearInterval(interval);
+      running = false;
+      alert("Session complete!");
+    }
+    time--;
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(interval);
+  running = false;
+}
+
+/* MUSIC */
+function changeMusic(type) {
+  let src = document.getElementById("musicSource");
+
+  if(type==="lofi")
+    src.src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+  if(type==="nature")
+    src.src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+
+  if(type==="rain")
+    src.src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
+
+  document.getElementById("player").load();
+}
+
+/* THEME */
+function changeTheme(val){
+  if(val==="light"){
+    document.body.classList.add("light");
+    document.body.style.background="";
+  }
+  else if(val==="dark"){
+    document.body.classList.remove("light");
+    document.body.style.background="";
+  }
+  else{
+    document.body.classList.remove("light");
+    document.body.style.background=val;
+  }
+}
+
+/* AI */
+function openAI(){
+  window.location.href="tutor.html";
+}
+
+</script>
+
+</body>
+</html>
